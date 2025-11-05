@@ -1,0 +1,61 @@
+/* app/globals.css - minimal baseline */
+:root{
+  --bg:#0f1724;
+  --card:#0b1220;
+  --muted:#9aa4b2;
+  --accent:#0ea5a4;
+  --text:#e6eef6;
+}
+
+html,body,#__next {
+  height:100%;
+}
+
+body{
+  margin:0;
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;
+  background: #f7fafc;
+  color: #111827;
+}
+
+.container{
+  max-width:1000px;
+  margin:0 auto;
+  padding:12px;
+}
+
+.site-header{
+  background: white;
+  border-bottom:1px solid #e6e9ef;
+  position:sticky;
+  top:0;
+  z-index:50;
+}
+
+.site-header .container{
+  display:flex;
+  gap:12px;
+  align-items:center;
+  justify-content:space-between;
+}
+
+.main-nav a{
+  margin-left:12px;
+  text-decoration:none;
+  color: #111827;
+  font-size:14px;
+}
+
+.main-nav a:hover{ text-decoration:underline; }
+
+.main-content{
+  padding:20px 12px;
+}
+
+.site-footer{
+  margin-top:40px;
+  padding:16px 0;
+  text-align:center;
+  color: #374151;
+  font-size:13px;
+}
