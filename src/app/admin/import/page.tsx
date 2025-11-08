@@ -1,4 +1,4 @@
-// src/app/admin/import/page.tsx
+﻿// src/app/admin/import/page.tsx
 'use client';
 
 import React, { useState } from 'react';
@@ -132,7 +132,7 @@ export default function AdminImportPage() {
       Papa.parse<RowIn>(file, {
         header: true,
         skipEmptyLines: true,
-        complete: (res) => resolve(res),
+        complete: (res: any) => resolve(res as any),
         error: (err) => reject(err),
       });
     }).catch(err => {
@@ -307,7 +307,7 @@ export default function AdminImportPage() {
 
   return (
     <div style={{ padding: 12, maxWidth: 980, margin: '0 auto' }}>
-      <h2>Admin — Bulk CSV Import (Players)</h2>
+      <h2>Admin â€” Bulk CSV Import (Players)</h2>
 
       <p>
         CSV must include header row. Supported columns (case-insensitive): <strong>name, age, aadhaar, phone, preferredRole, teamName</strong>.
@@ -393,4 +393,5 @@ export default function AdminImportPage() {
     </div>
   );
 }
+
 

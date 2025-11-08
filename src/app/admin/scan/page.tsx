@@ -1,4 +1,4 @@
-// src/app/admin/scan/page.tsx
+﻿// src/app/admin/scan/page.tsx
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
@@ -47,7 +47,7 @@ export default function AdminScanPage() {
           await handleScannedValue(decodedText);
         },
         (errorMessage) => {
-          // qr scan failure per frame — ignore or display if needed
+          // qr scan failure per frame â€” ignore or display if needed
           // console.log('QR frame error', errorMessage);
         }
       );
@@ -96,7 +96,7 @@ export default function AdminScanPage() {
         return;
       }
       await updateDoc(ref, { checkedIn: true, checkedInAt: new Date().toISOString() });
-      setMessage('Player checked in: ' + (snap.data() as any).name ?? playerId);
+      setMessage('Player checked in: ' + ((snap.data() as any).name ?? playerId));
     } catch (err: any) {
       console.error('handleScannedValue error', err);
       setMessage('Failed to mark checked in: ' + (err?.message || err));
@@ -105,7 +105,7 @@ export default function AdminScanPage() {
 
   return (
     <div style={{ padding: 12, maxWidth: 900, margin: '0 auto' }}>
-      <h2>Admin — Scan QR to Check-in</h2>
+      <h2>Admin â€” Scan QR to Check-in</h2>
 
       <div style={{ marginTop: 12 }}>
         <div>
@@ -125,10 +125,10 @@ export default function AdminScanPage() {
           {!scanning ? (
             <div style={{ textAlign: 'center', color: '#666' }}>
               <div>Scanner stopped</div>
-              <div style={{ fontSize: 12 }}>Click “Start scanner” and allow camera access</div>
+              <div style={{ fontSize: 12 }}>Click â€œStart scannerâ€ and allow camera access</div>
             </div>
           ) : (
-            <div style={{ color: '#666' }}>Scanning… point camera at QR code</div>
+            <div style={{ color: '#666' }}>Scanningâ€¦ point camera at QR code</div>
           )}
         </div>
 
@@ -148,3 +148,4 @@ export default function AdminScanPage() {
     </div>
   );
 }
+
