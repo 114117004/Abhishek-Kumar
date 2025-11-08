@@ -3,7 +3,8 @@
 import React, { useState } from "react";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import app, { db } from "@/firebase/firebaseConfig";
-import { QRCodeCanvas } from "qrcode.react"; // ✅ Correct import
+import { QRCodeCanvas } from "qrcode.react";
+import toast from "react-hot-toast";
 
 export default function TrialSignupPage() {
   const [form, setForm] = useState({
@@ -13,8 +14,6 @@ export default function TrialSignupPage() {
     zone: "",
     role: "",
   });
-  const [message, setMessage] = useState("");
-  const [trialId, setTrialId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   // Aadhaar validation (12 digits)
@@ -28,139 +27,126 @@ export default function TrialSignupPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setMessage("");
-    setTrialId(null);
-
-    if (!form.name || !form.aadhaar || !form.zone || !form.role || !form.age) {
-      setMessage("⚠️ Please fill all fields.");
-      return;
-    }
 
     if (!isValidAadhaar(form.aadhaar)) {
-      setMessage("❌ Invalid Aadhaar number. Must be 12 digits.");
+      toast.error("Please enter a valid 12-digit Aadhaar number ❌");
       return;
     }
-
     if (!isValidAge(form.age)) {
-      setMessage("❌ Age must be between 16 and 40.");
+      toast.error("Age must be between 16 and 40 ❌");
       return;
     }
 
+    setLoading(true);
     try {
-      setLoading(true);
-      const newTrialId = `TRIAL-${Date.now().toString().slice(-6)}`;
-
       await addDoc(collection(db, "trials"), {
         ...form,
-        trialId: newTrialId,
         createdAt: serverTimestamp(),
-        checkedIn: false,
       });
-
-      setMessage(`✅ Registered successfully! Your Trial ID: ${newTrialId}`);
-      setTrialId(newTrialId);
+      toast.success("Trial registered successfully ✅");
       setForm({ name: "", aadhaar: "", age: "", zone: "", role: "" });
     } catch (error) {
-      console.error(error);
-      setMessage("❌ Failed to register. Try again later.");
+      console.error("Error adding document:", error);
+      toast.error("Something went wrong. Please try again ❌");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <main className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white shadow-lg p-6 rounded-xl w-full max-w-md border border-gray-200"
-      >
-        <h2 className="text-2xl font-bold mb-4 text-center text-blue-700">
-          🏏 Trial Signup
-        </h2>
-
-        <input
-          type="text"
-          placeholder="Full Name"
-          className="border p-2 w-full mb-3 rounded"
-          value={form.name}
-          onChange={(e) => setForm({ ...form, name: e.target.value })}
-          required
-        />
-
-        <input
-          type="text"
-          placeholder="Aadhaar Number (12 digits)"
-          className="border p-2 w-full mb-3 rounded"
-          value={form.aadhaar}
-          onChange={(e) => setForm({ ...form, aadhaar: e.target.value })}
-          required
-        />
-
-        <input
-          type="number"
-          placeholder="Age (16–40)"
-          className="border p-2 w-full mb-3 rounded"
-          value={form.age}
-          onChange={(e) => setForm({ ...form, age: e.target.value })}
-          required
-        />
-
-        <select
-          value={form.zone}
-          onChange={(e) => setForm({ ...form, zone: e.target.value })}
-          className="border p-2 w-full mb-3 rounded"
-          required
+    <main className="flex flex-col justify-between min-h-screen bg-gray-50">
+      {/* Centered Form */}
+      <div className="flex flex-col items-center justify-center flex-grow px-4">
+        <form
+          onSubmit={handleSubmit}
+          className="bg-white shadow-lg rounded-xl p-8 w-full max-w-md border border-gray-200"
         >
-          <option value="">Select Zone</option>
-          <option value="North">North</option>
-          <option value="South">South</option>
-          <option value="East">East</option>
-          <option value="West">West</option>
-        </select>
+          <h2 className="text-3xl font-bold mb-6 text-center text-purple-800">
+            🏏 Trial Signup
+          </h2>
 
-        <select
-          value={form.role}
-          onChange={(e) => setForm({ ...form, role: e.target.value })}
-          className="border p-2 w-full mb-3 rounded"
-          required
-        >
-          <option value="">Select Role</option>
-          <option value="Batsman">Batsman</option>
-          <option value="Bowler">Bowler</option>
-          <option value="All-rounder">All-rounder</option>
-          <option value="Wicketkeeper">Wicketkeeper</option>
-        </select>
+          {/* Stack all fields vertically */}
+          <div className="flex flex-col space-y-4">
+            <input
+              type="text"
+              placeholder="Full Name"
+              value={form.name}
+              onChange={(e) => setForm({ ...form, name: e.target.value })}
+              className="border p-2 w-full rounded focus:ring-2 focus:ring-blue-400 outline-none"
+              required
+            />
 
-        <button
-          type="submit"
-          disabled={loading}
-          className={`w-full py-2 rounded transition ${
-            loading ? "bg-gray-400" : "bg-blue-600 hover:bg-blue-700"
-          } text-white`}
-        >
-          {loading ? "Registering..." : "Register for Trial"}
-        </button>
+            <input
+              type="text"
+              placeholder="Aadhaar Number (12 digits)"
+              value={form.aadhaar}
+              onChange={(e) => setForm({ ...form, aadhaar: e.target.value })}
+              className="border p-2 w-full rounded focus:ring-2 focus:ring-blue-400 outline-none"
+              required
+            />
 
-        {message && (
-          <p className="mt-3 text-center text-sm font-medium text-gray-700">
-            {message}
-          </p>
+            <input
+              type="number"
+              placeholder="Age (16–40)"
+              value={form.age}
+              onChange={(e) => setForm({ ...form, age: e.target.value })}
+              className="border p-2 w-full rounded focus:ring-2 focus:ring-blue-400 outline-none"
+              required
+            />
+
+            <select
+              value={form.zone}
+              onChange={(e) => setForm({ ...form, zone: e.target.value })}
+              className="border p-2 w-full rounded focus:ring-2 focus:ring-blue-400 outline-none"
+              required
+            >
+              <option value="">Select Zone</option>
+              <option value="East">East</option>
+              <option value="West">West</option>
+              <option value="North">North</option>
+              <option value="South">South</option>
+            </select>
+
+            <select
+              value={form.role}
+              onChange={(e) => setForm({ ...form, role: e.target.value })}
+              className="border p-2 w-full rounded focus:ring-2 focus:ring-blue-400 outline-none"
+              required
+            >
+              <option value="">Select Role</option>
+              <option value="Batsman">Batsman</option>
+              <option value="Bowler">Bowler</option>
+              <option value="All-Rounder">All-Rounder</option>
+              <option value="Wicket Keeper">Wicket Keeper</option>
+            </select>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className={`w-full py-2 rounded text-white font-medium transition ${
+                loading
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-blue-600 hover:bg-blue-700"
+              }`}
+            >
+              {loading ? "Registering..." : "Register for Trial"}
+            </button>
+          </div>
+        </form>
+
+        {/* Optional QR preview */}
+        {form.name && (
+          <div className="mt-6 p-4 bg-white shadow rounded">
+            <h3 className="font-semibold mb-2 text-center">QR Preview</h3>
+            <QRCodeCanvas value={JSON.stringify(form)} size={128} />
+          </div>
         )}
-      </form>
+      </div>
 
-      {/* ✅ Show QR Code on success */}
-      {trialId && (
-        <div className="mt-6 text-center bg-white p-4 rounded-xl shadow-md border border-gray-200">
-          <h3 className="text-lg font-semibold mb-2 text-green-700">
-            🎫 Your Trial QR Code
-          </h3>
-          <QRCodeCanvas value={trialId} size={180} />
-          <p className="text-sm text-gray-600 mt-2">Trial ID: {trialId}</p>
-          <p className="text-xs text-gray-500">
-            Please screenshot or save this QR code. You'll need it for ground verification.
-          </p>
-        </div>
-      )}
+      {/* Center footer */}
+      <footer className="text-center py-4 text-gray-600 border-t">
+        © {new Date().getFullYear()} Poorwanchal Premier League
+      </footer>
     </main>
   );
 }
